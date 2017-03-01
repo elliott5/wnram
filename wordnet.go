@@ -156,6 +156,12 @@ func (w *Lookup) Gloss() string {
 	return w.cluster.gloss
 }
 
+// Debug contains the in-source-file offset to the cluster.
+// Unique when combind with POS.
+func (w *Lookup) Debug() string {
+	return w.cluster.debug
+}
+
 func (w *Lookup) DumpStr() string {
 	s := fmt.Sprintf("Word: %s\n", w.String())
 	s += fmt.Sprintf("Synonyms: ")
