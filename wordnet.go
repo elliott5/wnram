@@ -276,7 +276,8 @@ func New(dir string) (*Handle, error) {
 					rcluster, ok := byOffset[rindex]
 					if !ok {
 						// create the other side of the relationship
-						rcluster = &cluster{}
+						cid++
+						rcluster = &cluster{id: cid}
 						byOffset[rindex] = rcluster
 					}
 					if r.isSemantic {
@@ -327,7 +328,7 @@ func New(dir string) (*Handle, error) {
 		}
 	}
 
-	//fmt.Println("DEBUG cid:", cid)
+	//fmt.Println(cid, "unique clusters loaded")
 
 	return &h, nil
 }
