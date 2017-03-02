@@ -46,6 +46,7 @@ type word struct {
 }
 
 type cluster struct {
+	id        int
 	pos       PartOfSpeech
 	words     []word
 	gloss     string
@@ -162,6 +163,11 @@ func (w *Lookup) Debug() string {
 	return w.cluster.debug
 }
 
+// ID is unique for each cluster, zero is invalid.
+func (w *Lookup) ID() int {
+	return w.cluster.id
+}
+
 func (w *Lookup) DumpStr() string {
 	s := fmt.Sprintf("Word: %s\n", w.String())
 	s += fmt.Sprintf("Synonyms: ")
@@ -223,6 +229,7 @@ func (w *Lookup) Related(r Relation) (relationships []Lookup) {
 // Initialize a new in-ram WordNet databases reading files from the
 // specified directory.
 func New(dir string) (*Handle, error) {
+	cid := 0 // cluster ID, 0==invalid
 	cnt := 0
 	type ix struct {
 		index string
@@ -253,7 +260,8 @@ func New(dir string) (*Handle, error) {
 				index := ix{p.byteOffset, p.pos}
 				c, ok := byOffset[index]
 				if !ok {
-					c = &cluster{}
+					cid++
+					c = &cluster{id: cid}
 					byOffset[index] = c
 				}
 				// now update
@@ -318,6 +326,8 @@ func New(dir string) (*Handle, error) {
 			h.index[key] = v
 		}
 	}
+
+	//fmt.Println("DEBUG cid:", cid)
 
 	return &h, nil
 }
