@@ -2,9 +2,6 @@ package wnram
 
 import (
 	"fmt"
-	"os"
-	"path"
-	"path/filepath"
 	"strings"
 	"time"
 )
@@ -227,7 +224,7 @@ func (w *Lookup) Related(r Relation) (relationships []Lookup) {
 }
 
 // Initialize a new in-ram WordNet databases reading files from the
-// specified directory.
+// AssetFS rather than the specified directory.
 func New(dir string) (*Handle, error) {
 	cid := 0 // cluster ID, 0==invalid
 	cnt := 0
@@ -236,20 +233,24 @@ func New(dir string) (*Handle, error) {
 		pos   PartOfSpeech
 	}
 	byOffset := map[ix]*cluster{}
-	err := filepath.Walk(dir, func(filename string, info os.FileInfo, err error) error {
-		start := time.Now()
-		if err != nil || info.IsDir() {
-			return err
-		}
 
-		// Skip '^.', '~$', and non-files.
-		if strings.HasPrefix(path.Base(filename), ".") || strings.HasSuffix(filename, "~") || strings.HasSuffix(filename, "#") {
-			return nil
-		}
-		// read only data files
-		if !strings.HasPrefix(path.Base(filename), "data") {
-			return nil
-		}
+	var err error
+	for _, filename := range AssetNames() {
+
+		//	err := filepath.Walk(dir, func(filename string, info os.FileInfo, err error) error {
+		start := time.Now()
+		// if err != nil || info.IsDir() {
+		// 	return err
+		// }
+
+		// // Skip '^.', '~$', and non-files.
+		// if strings.HasPrefix(path.Base(filename), ".") || strings.HasSuffix(filename, "~") || strings.HasSuffix(filename, "#") {
+		// 	return nil
+		// }
+		// // read only data files
+		// if !strings.HasPrefix(path.Base(filename), "data") {
+		// 	return nil
+		// }
 
 		err = inPlaceReadLineFromPath(filename, func(data []byte, line, offset int64) error {
 			cnt++
@@ -301,8 +302,9 @@ func New(dir string) (*Handle, error) {
 			return nil
 		})
 		fmt.Printf("%s in %s\n", filename, time.Since(start).String())
-		return err
-	})
+		// 	return err
+		// })
+	}
 	if err != nil {
 		return nil, err
 	}

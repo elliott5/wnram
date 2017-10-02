@@ -1,9 +1,11 @@
+//go:generate go-bindata-assetfs -pkg wnram data/data.*
+
 package wnram
 
 import (
 	"bufio"
+	"bytes"
 	"io"
-	"os"
 )
 
 // InPlaceReadLine scans a file and invoke the provided callback for
@@ -38,10 +40,11 @@ func inPlaceReadLine(s io.Reader, cb func([]byte, int64, int64) error) error {
 }
 
 func inPlaceReadLineFromPath(filePath string, cb func([]byte, int64, int64) error) error {
-	f, err := os.Open(filePath)
+	//f, err := os.Open(filePath)
+	content, err := Asset(filePath)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
-	return inPlaceReadLine(f, cb)
+	//defer f.Close()
+	return inPlaceReadLine(bytes.NewReader(content), cb)
 }
